@@ -1,0 +1,8 @@
+#rec_border{
+    pointer-events: none;
+    position: absolute;
+    border: 5px solid blue;
+    background-color: white;
+    color: white;
+    font-weight: bold;
+}
