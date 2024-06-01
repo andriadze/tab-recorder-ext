@@ -6,8 +6,11 @@ interface Props {
 }
 export function RecordButton(props: Props) {
   return (
-    <div onClick={props.onClick} className={`rec-button ${props.isRecording && "animate-flicker"}`}>
-      <span className="rec-text">{props.isRecording ? 'STOP' : 'REC'}</span>
-    </div>
+    <div
+      onClick={props.onClick}
+      className={`rec-button ${
+        props.isRecording && "animate-flicker"
+      } rec-button-active`}
+    ></div>
   );
 }

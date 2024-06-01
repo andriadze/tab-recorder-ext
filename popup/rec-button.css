@@ -1,13 +1,33 @@
 .rec-button {
   cursor: pointer;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgb(213, 59, 59);
   border-radius: 9999px;
   animation: fade 2s linear;
+  transition: scale 0.5s ease;
+  margin-bottom: 20px;
+  margin-top: 35px;
+}
+
+.rec-button:hover {
+  background-color: rgb(220 38 38);
+  scale: 1.1;
+}
+
+.rec-button:active {
+  background-color: rgb(185 28 28);
+}
+
+.rec-button-active {
+  background-color: rgb(185 28 28);
+  animation-name: pulse;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }
 
 .rec-text {
@@ -65,4 +85,16 @@
   -moz-animation: flickerAnimation 2s infinite;
   -o-animation: flickerAnimation 2s infinite;
   animation: flickerAnimation 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0px 0px 10px 0px rgba(173, 0, 0, 0.3);
+  }
+  65% {
+    box-shadow: 0px 0px 10px 18px rgba(173, 0, 0, 0.3);
+  }
+  90% {
+    box-shadow: 0px 0px 10px 18px rgba(173, 0, 0, 0);
+  }
 }

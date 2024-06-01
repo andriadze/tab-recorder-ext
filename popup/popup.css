@@ -1,8 +1,229 @@
-.popup-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 150px;
-    height: 150px;
+body {
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 270px;
+  height: 300px;
+  position: relative;
+  padding-top: 20px;
+  overflow: hidden;
+}
+
+.close-button {
+  position: absolute;
+  left: -2px;
+  top: 0px;
+  height: 30px;
+  width: 30px;
+  background-color: transparent;
+  border: none;
+  transition: all 0.2s ease;
+  color: black;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #111a2c;
+  color: white;
+  border-radius: 4px;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+}
+
+.logo img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.red-button-paragraphs {
+  color: rgb(185 28 28);
+  margin: 0px;
+  font-size: 13px;
+}
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.settings-list-button {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 10px 20px;
+  cursor: pointer;
+  width: full;
+  border-radius: 12px;
+  border: none;
+  background-color: transparent;
+  transition: all 0.5s ease;
+  color: darkslategray;
+}
+
+.settings-list-button:hover {
+  scale: 1.02;
+  background-color: #f1f1f1;
+}
+
+.settings-list-button:active {
+  background-color: #e5e2e2;
+}
+
+.settings-image-container {
+  width: 15px;
+  height: 15px;
+}
+
+.settings-image-container img {
+  object-fit: contain;
+  width: 100%;
+  color: white;
+  height: 100%;
+}
+
+.login-container-paragraph {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 90px;
+  color: gray;
+}
+
+.login-button {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: all 0.5s;
+  margin-top: 40px;
+  letter-spacing: 4px;
+  color: #1677ff;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #1677ff;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 25px rgb(31, 172, 179);
+}
+
+.login-button:active {
+  background-color: #1255cc;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 25px rgb(34, 198, 207);
+}
+
+.button-container {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.button-container span {
+  position: absolute;
+  display: block;
+}
+
+@keyframes btnAnimA {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+.button-container span:nth-child(1) {
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #1677ff);
+  animation: btnAnimA 1500ms linear infinite;
+  animation-fill-mode: backwards;
+  animation-play-state: running;
+}
+
+@keyframes btnAnimB {
+  0% {
+    top: -100%;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+.button-container span:nth-child(2) {
+  top: -100%;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #1677ff);
+  animation: btnAnimB 1500ms linear infinite;
+  animation-delay: 300ms;
+}
+
+@keyframes btnAnimC {
+  0% {
+    right: -100%;
+  }
+  50% {
+    right: 100%;
+  }
+  100% {
+    right: 100%;
+  }
+}
+.button-container span:nth-child(3) {
+  bottom: 0;
+  right: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(270deg, transparent, #1677ff);
+  animation: btnAnimC 1500ms linear infinite;
+  animation-delay: 600ms;
+}
+
+@keyframes btnAnimD {
+  0% {
+    bottom: -100%;
+  }
+  50%,
+  100% {
+    bottom: 100%;
+  }
+}
+.button-container span:nth-child(4) {
+  left: 0;
+  bottom: -100%;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(360deg, transparent, #1677ff);
+  animation: btnAnimD 1500ms linear infinite;
+  animation-delay: 900ms;
 }
