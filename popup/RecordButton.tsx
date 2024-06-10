@@ -9,8 +9,8 @@ export function RecordButton(props: Props) {
     <div
       onClick={props.onClick}
       className={`rec-button ${
-        props.isRecording && "animate-flicker"
-      } rec-button-active`}
+        props.isRecording && "rec-button-active"
+      } `}
     ></div>
   );
 }

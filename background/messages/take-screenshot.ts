@@ -6,7 +6,9 @@ import type { Guide } from "~ts/Guide";
 const storage = new Storage();
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
+  console.log('Handingling screenshot');
   await chrome.tabs.captureVisibleTab(null, {}, async function (image) {
+    console.log('Tab captured!');
     const currGuide = await storage.get<Guide>("guide");
     if (!currGuide.active) {
       return;

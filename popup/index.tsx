@@ -12,8 +12,7 @@ function IndexPopup() {
   const { guide, startRecording, stopRecording } = useGuide();
 
   const handleLogin = () => {
-    const newURL = "http://stackoverflow.com/";
-    chrome.tabs.create({ url: newURL });
+    chrome.tabs.create({ url: process.env.PLASMO_PUBLIC_AUTH_ROUTE });
   };
 
   return (
@@ -22,7 +21,7 @@ function IndexPopup() {
         <img src={logoImage} alt="" />{" "}
       </div>
       <button className="close-button">X</button>
-      {!AuthHandler.isLoggedIn() ? (
+      {AuthHandler.isLoggedIn() ? (
         <>
           <RecordButton
             isRecording={guide?.active}

@@ -31,7 +31,7 @@ export function useGuide() {
     await stopRecordingApi(guide.id);
     setGuide(stoppedGuide);
     sendMessageToActivePage('stopRecording');
-    chrome.tabs.create({ url: `${process.env.PLASMO_PUBLIC_APP_ROUTE}/${stoppedGuide.id}` });
+    chrome.tabs.create({ url: `${process.env.PLASMO_PUBLIC_APP_ROUTE}/guides/${stoppedGuide.id}` });
   };
 
   useEffect(() => {
