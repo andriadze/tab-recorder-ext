@@ -1,10 +1,14 @@
-import { AuthApiClient } from "~util/AuthApi";
+import fetchWithAuth from "~util/AuthApi";
 
 export async function startRecordingApi() {
   try {
-    const res = await AuthApiClient.post("/guides", {});
+    const res = await fetchWithAuth("/guides", {
+      method: "POST",
+    });
 
-    return res.data;
+    const json = await res.json();
+
+    return json;
   } catch (err) {
     console.log(err);
     return null;
@@ -13,11 +17,16 @@ export async function startRecordingApi() {
 
 export async function stopRecordingApi(guideId: number) {
   try {
-    const res = await AuthApiClient.post(`/guides/${guideId}`, {
-      active: false,
+    const res = await fetchWithAuth(`/guides/${guideId}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        active: false,
+      }),
     });
 
-    return res.data;
+    const json = await res.json();
+
+    return json;
   } catch (err) {
     console.log(err);
     return null;

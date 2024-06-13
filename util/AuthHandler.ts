@@ -1,5 +1,4 @@
 import { Storage } from "@plasmohq/storage";
-import axios from "axios";
 import type { Auth } from "~ts/Auth";
 
 class AuthHandler {
@@ -22,7 +21,6 @@ class AuthHandler {
       (listener) => listener != loginListener
     );
   }
-  
 
   isLoggedIn() {
     return Boolean(this.token && this.refresh);
@@ -72,21 +70,24 @@ class AuthHandler {
 
   async refreshToken(): Promise<Auth | null> {
     try {
-      const res = await axios.post<Auth>(
+      const res = await fetch(
         `${process.env.PLASMO_PUBLIC_API_ROUTE}/auth/refresh`,
         {
-          refresh: this.getRefresh(),
-        },
-        {
+          method: "POST",
+          body: JSON.stringify({
+            refresh: this.getRefresh(),
+          }),
           headers: {
             Authorization: `Bearer ${this.getAccessToken()}`,
+            "Content-Type": "application/json",
           },
         }
       );
+      const json = (await res.json()) as Auth;
 
-      await this.setTokens(res.data);
+      await this.setTokens(json);
 
-      return res.data;
+      return json;
     } catch (exc) {
       this.logout();
       return null;

@@ -7,7 +7,7 @@ import { sendMessageToActivePage } from "~util/messaging";
 const storage = new Storage();
 
 export function useGuide() {
-  const [guide, setGuide] = useState<null | Guide>();
+  const [guide, setGuide] = useState<null | Guide>(null);
 
   const initGuide = async () => {
     const currGuide = await storage.get<Guide>("guide");

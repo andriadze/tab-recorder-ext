@@ -1,15 +1,23 @@
 import type { Step } from "~ts/Step";
-import { AuthApiClient } from "~util/AuthApi";
+import fetchWithAuth from "~util/AuthApi";
 import { dataURItoBlob } from "~util/dataUriToBlob";
 
 export async function createStep(guideId: number, stepInfo: Step) {
   try {
-    const stepCreationResp = await AuthApiClient.post("/steps", {
-      guideId,
-      ...stepInfo,
+    const stepCreationResp = await fetchWithAuth("/steps", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        guideId,
+        ...stepInfo,
+      }),
     });
 
-    return stepCreationResp.data;
+    const json = await stepCreationResp.json();
+
+    return json;
   } catch (exc) {
     console.log(exc);
 
@@ -22,8 +30,15 @@ export async function uploadImage(step: Step, image: string) {
     const blob = dataURItoBlob(image);
     const formData = new FormData();
     formData.append("file", blob);
-    await AuthApiClient.post(`/steps/${step.id}/upload`, formData);
+    const res = await fetchWithAuth(`/steps/${step.id}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const json = res.json();
+    console.log(json);
   } catch (exc) {
+    console.log(exc);
     return null;
   }
 }

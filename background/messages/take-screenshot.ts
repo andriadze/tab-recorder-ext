@@ -6,20 +6,22 @@ import type { Guide } from "~ts/Guide";
 const storage = new Storage();
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
-  console.log('Handingling screenshot');
+  console.log("Handingling screenshot");
   await chrome.tabs.captureVisibleTab(null, {}, async function (image) {
-    console.log('Tab captured!');
+    console.log("Tab captured!");
     const currGuide = await storage.get<Guide>("guide");
     if (!currGuide.active) {
       return;
     }
     const step = await createStep(currGuide.id, req.body);
 
+    console.log("Image maybe missing", step);
     if (!image) {
       return;
     }
 
-    await uploadImage(step.id, image);
+    console.log("Calling upload image", step, image);
+    await uploadImage(step, image);
     res.send({
       img: image,
     });

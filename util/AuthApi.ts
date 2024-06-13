@@ -1,33 +1,34 @@
-import axios from "axios";
 import AuthHandler from "./AuthHandler";
 
-export const AuthApiClient = axios.create({
-    baseURL: process.env.PLASMO_PUBLIC_API_ROUTE
-});
-// Request interceptor for API calls
-AuthApiClient.interceptors.request.use(
-  async (config) => {
-    config.headers.Authorization = `Bearer ${AuthHandler.getAccessToken()}`;
-    return config;
-  },
-  (error) => {
-    Promise.reject(error);
-  }
-);
-// Response interceptor for API calls
-AuthApiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async function (error) {
-    const originalRequest = error.config;
-    if (error.response.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
+const baseURL = process.env.PLASMO_PUBLIC_API_ROUTE;
+
+const fetchWithAuth = async (url: string, options: RequestInit) => {
+  // Add the Authorization header to the request
+  const accessToken = AuthHandler.getAccessToken();
+  options.headers = {
+    ...options.headers,
+    Authorization: `Bearer ${accessToken}`,
+  };
+
+
+  console.log('Fetching', url, options)
+  const fetchWithRetry = async () => {
+    const response = await fetch(baseURL + url, options);
+    if (response.status === 403 || response.status === 401) {
       const res = await AuthHandler.refreshToken();
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + res?.access_token;
-      return AuthApiClient(originalRequest);
+      options.headers["Authorization"] = `Bearer ${res?.access_token}`;
+      return fetch(baseURL + url, options);
     }
+    return response;
+  };
+
+  try {
+    const response = await fetchWithRetry();
+    return response;
+  } catch (error) {
+    console.log(error)
     return Promise.reject(error);
   }
-);
+};
+
+export default fetchWithAuth;

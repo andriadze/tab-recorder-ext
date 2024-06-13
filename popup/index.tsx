@@ -10,6 +10,7 @@ import logoImage from "data-base64:~/assets/logo.png";
 
 function IndexPopup() {
   const { guide, startRecording, stopRecording } = useGuide();
+  console.log("Guide", guide);
 
   const handleLogin = () => {
     chrome.tabs.create({ url: process.env.PLASMO_PUBLIC_AUTH_ROUTE });
@@ -20,20 +21,25 @@ function IndexPopup() {
       <div className="logo">
         <img src={logoImage} alt="" />{" "}
       </div>
-      <button className="close-button">X</button>
+      <button className="close-button" onClick={() => window.close()}>
+        x
+      </button>
       {AuthHandler.isLoggedIn() ? (
         <>
           <RecordButton
             isRecording={guide?.active}
-            onClick={() => {
+            onClick={async () => {
               if (guide?.active) {
                 stopRecording();
               } else {
-                startRecording();
+                await startRecording();
+                window.close();
               }
             }}
           />
-          <div className="red-button-paragraphs">START RECORDING</div>
+          <div className="red-button-paragraphs">
+            {guide?.active ? "STOP RECORDING" : "START RECORDING"}
+          </div>
           <div className="settings-list">
             <button className="settings-list-button">
               <div className="settings-image-container">
