@@ -4,7 +4,7 @@ const baseURL = process.env.PLASMO_PUBLIC_API_ROUTE;
 
 const fetchWithAuth = async (url: string, options: RequestInit) => {
   // Add the Authorization header to the request
-  const accessToken = AuthHandler.getAccessToken();
+  const accessToken = await AuthHandler.getAccessToken();
   options.headers = {
     ...options.headers,
     Authorization: `Bearer ${accessToken}`,

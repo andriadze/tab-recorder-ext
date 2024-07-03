@@ -1,9 +1,9 @@
 {
-  "name": "tab-recorder",
-  "displayName": "Tab recorder",
-  "version": "0.0.2",
-  "description": "Record tabs to build guides",
-  "author": "Plasmo Corp. <foss@plasmo.com>",
+  "name": "guidemagic",
+  "displayName": "GuideMagic",
+  "version": "0.0.3",
+  "description": "Effortlessly record your actions and generate clear, step-by-step guides. Perfect for tutorials and onboarding!",
+  "author": "guidemagic.ai. <info@guidemagic.ai>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
@@ -39,7 +39,8 @@
     ],
     "externally_connectable": {
       "matches": [
-        "https://dolphin-app-f75yi.ondigitalocean.app/*",
+        "https://app.guidemagic.ai//*",
+        "https://guidemagic.ai//*",
         "http://localhost:3000/*",
         "http://localhost:3001/*"
       ]

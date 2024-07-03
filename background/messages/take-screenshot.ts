@@ -20,6 +20,12 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       return;
     }
 
+    const newGuide: Guide = {
+      ...currGuide,
+      stepCount: currGuide.stepCount + 1 || 1,
+    };
+    await storage.set("guide", newGuide);
+
     console.log("Calling upload image", step, image);
     await uploadImage(step, image);
     res.send({

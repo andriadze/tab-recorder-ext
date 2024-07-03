@@ -113,24 +113,24 @@ body {
   transition: all 0.5s;
   margin-top: 40px;
   letter-spacing: 4px;
-  color: #1677ff;
+  color: #000;
   border: none;
   background: transparent;
   cursor: pointer;
 }
 
 .login-button:hover {
-  background-color: #1677ff;
+  background-color: #000;
   color: #fff;
   border-radius: 5px;
-  box-shadow: 0 0 25px rgb(31, 172, 179);
+  box-shadow: 0 0 25px rgb(83, 83, 83);
 }
 
 .login-button:active {
-  background-color: #1255cc;
+  background-color: #000;
   color: #fff;
   border-radius: 5px;
-  box-shadow: 0 0 25px rgb(34, 198, 207);
+  box-shadow: 0 0 25px rgb(83, 83, 83);
 }
 
 .button-container {
@@ -161,7 +161,7 @@ body {
   left: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #1677ff);
+  background: linear-gradient(90deg, transparent, #000);
   animation: btnAnimA 1500ms linear infinite;
   animation-fill-mode: backwards;
   animation-play-state: running;
@@ -183,7 +183,7 @@ body {
   right: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, transparent, #1677ff);
+  background: linear-gradient(180deg, transparent, #000);
   animation: btnAnimB 1500ms linear infinite;
   animation-delay: 300ms;
 }
@@ -204,7 +204,7 @@ body {
   right: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(270deg, transparent, #1677ff);
+  background: linear-gradient(270deg, transparent, #000);
   animation: btnAnimC 1500ms linear infinite;
   animation-delay: 600ms;
 }
@@ -223,7 +223,7 @@ body {
   bottom: -100%;
   width: 2px;
   height: 100%;
-  background: linear-gradient(360deg, transparent, #1677ff);
+  background: linear-gradient(360deg, transparent, #000);
   animation: btnAnimD 1500ms linear infinite;
   animation-delay: 900ms;
 }

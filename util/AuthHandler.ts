@@ -60,25 +60,34 @@ class AuthHandler {
     await this.storage.clear();
   }
 
-  getAccessToken() {
+  async getAccessToken() {
+    if(!this.token){
+      await this.load()
+    }
     return this.token;
   }
 
-  getRefresh() {
+  async getRefresh() {
+    if(!this.token){
+      await this.load()
+    }
+
     return this.refresh;
   }
 
   async refreshToken(): Promise<Auth | null> {
     try {
+      const token = await this.getAccessToken();
+      const refresh = await this.getRefresh()
       const res = await fetch(
         `${process.env.PLASMO_PUBLIC_API_ROUTE}/auth/refresh`,
         {
           method: "POST",
           body: JSON.stringify({
-            refresh: this.getRefresh(),
+            refresh,
           }),
           headers: {
-            Authorization: `Bearer ${this.getAccessToken()}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }

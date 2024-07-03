@@ -6,4 +6,5 @@ export interface Guide {
   description?: string;
   active?: boolean;
   steps?: Step[];
+  stepCount?: number;
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RecordButton } from "./RecordButton";
 import "./popup.css";
 import { useGuide } from "./hooks/useGuide";
@@ -41,7 +41,7 @@ function IndexPopup() {
             {guide?.active ? "STOP RECORDING" : "START RECORDING"}
           </div>
           <div className="settings-list">
-            <button className="settings-list-button">
+            <button onClick={() => window.open('https://app.guidemagic.ai/', '_blank')} className="settings-list-button">
               <div className="settings-image-container">
                 <img src={guideImage} alt="" />
               </div>

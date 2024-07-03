@@ -3,6 +3,7 @@ import { Storage } from "@plasmohq/storage";
 import { startRecordingApi, stopRecordingApi } from "../../api/guide.api";
 import type { Guide } from "~ts/Guide";
 import { sendMessageToActivePage } from "~util/messaging";
+import { stopRecording as handleStopRecording } from "~util/stopRecording";
 
 const storage = new Storage();
 
@@ -27,11 +28,9 @@ export function useGuide() {
 
   const stopRecording = async () => {
     const stoppedGuide = { ...guide, active: false };
-    await storage.set('guide', stoppedGuide);
-    await stopRecordingApi(guide.id);
     setGuide(stoppedGuide);
-    sendMessageToActivePage('stopRecording');
-    chrome.tabs.create({ url: `${process.env.PLASMO_PUBLIC_APP_ROUTE}/guides/${stoppedGuide.id}` });
+    await handleStopRecording()
+
   };
 
   useEffect(() => {
