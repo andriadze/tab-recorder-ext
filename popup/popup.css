@@ -11,7 +11,6 @@ body {
   height: 300px;
   position: relative;
   padding-top: 20px;
-  overflow: hidden;
 }
 
 .close-button {
@@ -51,7 +50,7 @@ body {
 }
 .settings-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   width: 100%;
   justify-content: center;
@@ -81,6 +80,11 @@ body {
 
 .settings-list-button:active {
   background-color: #e5e2e2;
+}
+
+.back-image-container {
+  width: 20px;
+  height: 20px;
 }
 
 .settings-image-container {

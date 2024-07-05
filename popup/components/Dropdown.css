@@ -1,0 +1,74 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 220px;
+}
+
+.dropdown-selected {
+  padding: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 1000;
+  overflow-y: auto;
+  max-height: 120px;
+}
+
+.dropdown-options .color-option {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.color-ball {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.color-ball.red {
+  background-color: rgb(220, 20, 60);
+}
+
+.color-ball.green {
+  background-color: rgb(46, 139, 87);
+}
+
+.color-ball.pink {
+  background-color: rgb(255, 182, 193);
+}
+
+.color-ball.blue {
+  background-color: rgb(30, 144, 255);
+}
+
+.color-ball.yellow {
+  background-color: rgb(255, 223, 0);
+}
+
+.color-ball.purple {
+  background-color: rgb(186, 85, 211);
+}
+
+.color-ball.gray {
+  background-color: rgb(119, 136, 153);
+}
+
+.color-ball.black {
+  background-color: rgb(0, 0, 0);
+}
+
+.color-option:hover {
+  background-color: #f0f0f0;
+}

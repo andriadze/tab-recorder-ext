@@ -1,17 +1,9 @@
-import { useEffect, useState } from "react";
-import { RecordButton } from "./RecordButton";
 import "./popup.css";
-import { useGuide } from "./hooks/useGuide";
 import AuthHandler from "../util/AuthHandler";
-
-import guideImage from "data-base64:~/assets/guideList.png";
-
 import logoImage from "data-base64:~/assets/logo.png";
+import { RecordMode } from "./components/RecordMode";
 
 function IndexPopup() {
-  const { guide, startRecording, stopRecording } = useGuide();
-  console.log("Guide", guide);
-
   const handleLogin = () => {
     chrome.tabs.create({ url: process.env.PLASMO_PUBLIC_AUTH_ROUTE });
   };
@@ -24,31 +16,9 @@ function IndexPopup() {
       <button className="close-button" onClick={() => window.close()}>
         x
       </button>
+
       {AuthHandler.isLoggedIn() ? (
-        <>
-          <RecordButton
-            isRecording={guide?.active}
-            onClick={async () => {
-              if (guide?.active) {
-                stopRecording();
-              } else {
-                await startRecording();
-                window.close();
-              }
-            }}
-          />
-          <div className="red-button-paragraphs">
-            {guide?.active ? "STOP RECORDING" : "START RECORDING"}
-          </div>
-          <div className="settings-list">
-            <button onClick={() => window.open('https://app.guidemagic.ai/', '_blank')} className="settings-list-button">
-              <div className="settings-image-container">
-                <img src={guideImage} alt="" />
-              </div>
-              My Guides
-            </button>
-          </div>
-        </>
+        <RecordMode />
       ) : (
         <>
           <p className="login-container-paragraph">
