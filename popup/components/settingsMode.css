@@ -1,0 +1,13 @@
+.settings-container {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: start;
+}
+
+.back-button-container {
+  position: absolute;
+  right: 5px;
+  top: -100px;
+}
