@@ -41,6 +41,7 @@ export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (
 
 const PlasmoPricingExtra = () => {
   const [stepCount, setStepCount] = useState(0);
+  const [recordingStarting, setRecordingStarting] = useState(false);
   const [isRecording, setRecording] = useState(false);
   const [performAnim, setPerformAnim] = useState(false);
   const [rect, setRect] = useState(null);
@@ -53,8 +54,8 @@ const PlasmoPricingExtra = () => {
     setPerformAnim(false);
     sendToBackground({
       name: "handle-stop-recording",
-      body: {}
-    })
+      body: {},
+    });
   };
 
   const getStepCount = async () => {
@@ -96,12 +97,16 @@ const PlasmoPricingExtra = () => {
   const handleRecorderStatusChange = useCallback(
     (request, sender, sendResponse) => {
       if (request.message === "startRecording") {
+        setRecordingStarting(false);
         setPerformAnim(true);
         setRecording(true);
       } else if (request.message === "stopRecording") {
+        setRecordingStarting(false);
         setRect(null);
         setRecording(false);
         setPerformAnim(false);
+      } else if (request.message === "recordingStarting") {
+        setRecordingStarting(true);
       }
     },
     [isRecording, setRecording, setRect]
@@ -119,10 +124,13 @@ const PlasmoPricingExtra = () => {
         return;
       }
       const target = event.target as HTMLElement;
-      if(target.tagName === 'PLASMO-CSUI' || target.id === '___guidemagic__inject__button__'){
+      if (
+        target.tagName === "PLASMO-CSUI" ||
+        target.id === "___guidemagic__inject__button__"
+      ) {
         return;
       }
-      
+
       const placeholder = target.getAttribute("placeholder");
       const title = parseTitle(target);
       const parentTitle = parseTitle(target.parentNode);
@@ -179,6 +187,19 @@ const PlasmoPricingExtra = () => {
   }, [setRecording, setRect]);
 
   useEffect(() => {
+    let timeoutId;
+    if (recordingStarting) {
+      timeoutId = setTimeout(() => {
+        setRecordingStarting(false);
+      }, 10000);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [recordingStarting]);
+
+  useEffect(() => {
     handleInit();
   }, [handleInit]);
 
@@ -209,7 +230,21 @@ const PlasmoPricingExtra = () => {
   ]);
 
   if (!rect) {
-    return <div className="main-container"></div>;
+    return (
+      <>
+        {recordingStarting && (
+          <div
+            className="main-container"
+            style={{
+              width: "100vw",
+              height: "100vh",
+            }}
+          >
+            <div className="rec-starting">Recording starting...</div>
+          </div>
+        )}
+      </>
+    );
   }
 
   return (
@@ -270,6 +305,18 @@ const RecButton = (props: {
 export const getStyle: PlasmoGetStyle = () => {
   const style = document.createElement("style");
   style.textContent = `
+  .rec-starting{
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 72px;
+    color: white;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
   .red-circle-count{
     position: absolute;
     display: flex;

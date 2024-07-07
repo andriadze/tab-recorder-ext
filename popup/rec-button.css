@@ -11,6 +11,8 @@
   transition: scale 0.5s ease;
   margin-bottom: 20px;
   margin-top: 35px;
+  color: white;
+  font-size: 20px;
 }
 
 .rec-button:hover {

@@ -11,6 +11,8 @@ export function RecordButton(props: Props) {
       className={`rec-button ${
         props.isRecording && "rec-button-active"
       } `}
-    ></div>
+    >
+      {props.isRecording ? 'STOP' : 'REC'}
+    </div>
   );
 }

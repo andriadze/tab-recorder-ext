@@ -20,6 +20,8 @@ export function useGuide() {
       await stopRecordingApi(guide.id);
       sendMessageToActivePage('stopRecording');
     }
+    
+    sendMessageToActivePage('recordingStarting');
     const newGuide = await startRecordingApi();
     await storage.set("guide", newGuide);
     setGuide(newGuide);
