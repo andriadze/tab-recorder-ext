@@ -4,7 +4,7 @@ import type { PlasmoCSConfig } from "plasmo";
 export const config: PlasmoCSConfig = {
   matches: [
     "http://localhost:5173/*",
-    "https://app.guidemagic.ai/*",
+    "https://dolphin-app-f75yi.ondigitalocean.app/*",
   ],
   all_frames: true,
 };
