@@ -1,29 +1,8 @@
-#rec_border {
+#guidemagic-rec_border {
   pointer-events: none;
   position: absolute;
-  border: 5px solid blue;
+  /* border: 5px solid blue; */
   background-color: white;
   color: white;
   font-weight: bold;
-}
-
-.main-container {
-  background-color: blue;
-}
-
-.ripple {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple 5s linear;
-  background-color: yellow;
-}
-
-
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
 }

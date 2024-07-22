@@ -17,11 +17,8 @@ export async function startRecordingApi() {
 
 export async function stopRecordingApi(guideId: number) {
   try {
-    const res = await fetchWithAuth(`/guides/${guideId}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        active: false,
-      }),
+    const res = await fetchWithAuth(`/guides/${guideId}/stop`, {
+      method: "POST",
     });
 
     const json = await res.json();

@@ -44,6 +44,7 @@ const PlasmoPricingExtra = () => {
   const [recordingStarting, setRecordingStarting] = useState(false);
   const [isRecording, setRecording] = useState(false);
   const [performAnim, setPerformAnim] = useState(false);
+  const [fade, setFade] = useState(false);
   const [rect, setRect] = useState(null);
   const lastElem = useRef<Element>();
 
@@ -118,6 +119,20 @@ const PlasmoPricingExtra = () => {
     }, 3000);
   }, [performAnim]);
 
+  const onMouseUp = () => {
+    if (!isRecording) {
+      return;
+    }
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === "PLASMO-CSUI" ||
+      target.id === "___guidemagic__inject__button__"
+    ) {
+      return;
+    }
+    setFade(true);
+  };
+
   const onMouseDown = useCallback(
     async (event) => {
       if (!isRecording) {
@@ -131,6 +146,7 @@ const PlasmoPricingExtra = () => {
         return;
       }
 
+      console.log("Event target", event.target);
       const placeholder = target.getAttribute("placeholder");
       const title = parseTitle(target);
       const parentTitle = parseTitle(target.parentNode);
@@ -206,7 +222,8 @@ const PlasmoPricingExtra = () => {
   useEffect(() => {
     document.addEventListener("mouseover", handleMouseOver);
     window.addEventListener("focus", handleInit);
-    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("pointerdown", onMouseDown);
+    document.addEventListener("pointerup", onMouseUp);
 
     document.addEventListener("scroll", handleScroll);
 
@@ -217,7 +234,8 @@ const PlasmoPricingExtra = () => {
     return () => {
       window.removeEventListener("focus", handleInit);
       document.removeEventListener("mouseover", handleMouseOver);
-      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("pointerdown", onMouseDown);
+      document.removeEventListener("pointerup", onMouseUp);
       document.removeEventListener("scroll", handleScroll);
       document.removeEventListener("scrollend", handleScrollFinished);
       chrome.runtime.onMessage.removeListener(handleRecorderStatusChange);
@@ -254,6 +272,14 @@ const PlasmoPricingExtra = () => {
           <span className="ripple"></span>
         </div>
       )}
+      {fade && (
+        <div
+          onAnimationEnd={() => {
+            setFade(false);
+          }}
+          className={"fade-in-container"}
+        />
+      )}
       <div
         id="rec_border"
         style={{
@@ -262,13 +288,17 @@ const PlasmoPricingExtra = () => {
           top: rect?.top - 3 - 6 + window.scrollY,
           left: rect?.left - 3 - 6 + window.scrollX,
           position: "absolute",
-          border: "3px solid blue",
+          // border: "3px solid blue",
           borderRadius: 3,
           pointerEvents: "none",
         }}
       ></div>
       {isRecording && (
-        <RecButton onStopClicked={handleStopRecording} stepCount={stepCount} />
+        <RecButton
+          animate={fade}
+          onStopClicked={handleStopRecording}
+          stepCount={stepCount}
+        />
       )}
     </>
   );
@@ -276,6 +306,7 @@ const PlasmoPricingExtra = () => {
 
 const RecButton = (props: {
   stepCount: number;
+  animate: boolean;
   onStopClicked: (ev: any) => void;
 }) => {
   const [hovering, setHovering] = useState(false);
@@ -283,7 +314,7 @@ const RecButton = (props: {
   return (
     <div
       id="___guidemagic__inject__button__"
-      className="recording-button"
+      className={`recording-button ${props.animate ? "rec-button-anim" : ""}`}
       onClick={props.onStopClicked}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
@@ -320,7 +351,7 @@ export const getStyle: PlasmoGetStyle = () => {
   .red-circle-count{
     position: absolute;
     display: flex;
-    right: 70px;
+    right: 90px;
     min-width: 80px;
     font-size: 15px;
     border-radius: 8px;
@@ -329,7 +360,7 @@ export const getStyle: PlasmoGetStyle = () => {
     justify-content: center;
     background-color: white;
     font-family: Arial;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 8px;
   }
 
   .main-container-ripple{
@@ -348,19 +379,62 @@ export const getStyle: PlasmoGetStyle = () => {
     background-color: rgba(255, 0, 0, 0.7);
   }
 
+  .fade-in-container {
+    animation: fadeIn 0.2s; 
+    z-index: 100;
+    background-color: white;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes expand {
+    0% { scale: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes scaleRec {
+      0%, 100% {
+          transform: scale(1);
+      }
+      50% {
+          transform: scale(1.1);
+      }
+    }
+
+   @keyframes scaleBounce {
+      0%, 100% {
+          transform: scale(1);
+      }
+      50% {
+          transform: scale(1.4);
+      }
+      70% {
+          transform: scale(1.2);
+      }
+    }
+
   .recording-logo{
-    width: 20px;
+    width: 50px;
     transition: 0.5s;
   }
   .red-circle{
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       background-color: red;
   }
 
   .recording-button {
-      width: 40px;
-      height: 40px;
+      width: 70px;
+      height: 70px;
       color: black;
       display: flex;
       justify-content: center;
@@ -374,12 +448,18 @@ export const getStyle: PlasmoGetStyle = () => {
       bottom: 50px;
       transition: 0.5s;
       font-family: Arial;
-      box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+      box-shadow: rgba(0, 0, 0, 0.26) 0px 1px 4px;
+      animation: scaleRec 2.5s infinite; 
+  }
+
+  .rec-button-anim{
+    animation: scaleBounce 0.2s;      
   }
 
   .recording-button:hover{
-      width: 50px;
-      height: 50px; 
+      width: 80px;
+      height: 80px; 
+      animation: none;
   }
 
   @keyframes ripple {

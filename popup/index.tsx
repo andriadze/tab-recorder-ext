@@ -10,7 +10,6 @@ import { LoginButton } from "./LoginButton";
 
 function IndexPopup() {
   const { guide, startRecording, stopRecording } = useGuide();
-  console.log("Guide", guide);
 
   return (
     <div className="popup-container">
@@ -29,7 +28,7 @@ function IndexPopup() {
                 stopRecording();
               } else {
                 await startRecording();
-                window.close();
+                // window.close();
               }
             }}
           />

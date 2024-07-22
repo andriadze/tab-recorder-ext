@@ -1,7 +1,7 @@
 {
   "name": "guidemagic",
   "displayName": "GuideMagic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Effortlessly record your actions and generate clear, step-by-step guides. Perfect for tutorials and onboarding!",
   "author": "guidemagic.ai. <info@guidemagic.ai>",
   "scripts": {
