@@ -28,7 +28,7 @@ function IndexPopup() {
                 stopRecording();
               } else {
                 await startRecording();
-                // window.close();
+                window.close();
               }
             }}
           />

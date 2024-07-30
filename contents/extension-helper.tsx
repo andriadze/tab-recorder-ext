@@ -1,4 +1,3 @@
-import { sendToBackground } from "@plasmohq/messaging";
 import type { PlasmoCSConfig } from "plasmo";
 
 export const config: PlasmoCSConfig = {
@@ -9,7 +8,17 @@ export const config: PlasmoCSConfig = {
   ],
 };
 
-setTimeout(function() {
+setTimeout(() => {
   /* Example: Send data from the page to your Chrome extension */
-  document.dispatchEvent(new CustomEvent('$$_guidemagic_extension_present_$$', {}));
-}, 0);
+  document.dispatchEvent(
+    new CustomEvent("$$_guidemagic_extension_present_$$", {})
+  );
+}, 100);
+
+
+setInterval(() => {
+  /* Example: Send data from the page to your Chrome extension */
+  document.dispatchEvent(
+    new CustomEvent("$$_guidemagic_extension_present_$$", {})
+  );
+}, 2000);

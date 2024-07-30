@@ -25,7 +25,7 @@ export async function createStep(guideId: number, stepInfo: Step) {
   }
 }
 
-export async function uploadImage(step: Step, image: string) {
+export async function uploadImage(step: Step, image: string, retry = 0) {
   try {
     const blob = dataURItoBlob(image);
     const formData = new FormData();
@@ -37,8 +37,12 @@ export async function uploadImage(step: Step, image: string) {
 
     const json = res.json();
     console.log(json);
+    return true;
   } catch (exc) {
     console.log(exc);
+    if(retry < 3){
+      uploadImage(step, image, retry + 1)
+    }
     return null;
   }
 }

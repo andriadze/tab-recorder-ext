@@ -191,14 +191,18 @@ const PlasmoPricingExtra = () => {
   );
 
   const handleInit = useCallback(async () => {
-    const res = await storage.get<Guide>("guide");
-    if (res && res.active) {
-      setStepCount(res.stepCount || 0);
-      setRecording(true);
-    } else {
-      setStepCount(0);
-      setRecording(false);
-      setRect(null);
+    try {
+      const res = await storage.get<Guide>("guide");
+      if (res && res.active) {
+        setStepCount(res.stepCount || 0);
+        setRecording(true);
+      } else {
+        setStepCount(0);
+        setRecording(false);
+        setRect(null);
+      }
+    } catch (exc) {
+      // alert('We detected broken situation pls refresh!!!!')
     }
   }, [setRecording, setRect]);
 

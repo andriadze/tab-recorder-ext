@@ -10,8 +10,7 @@ const fetchWithAuth = async (url: string, options: RequestInit) => {
     Authorization: `Bearer ${accessToken}`,
   };
 
-
-  console.log('Fetching', url, options)
+  console.log("Fetching", url, options);
   const fetchWithRetry = async () => {
     const response = await fetch(baseURL + url, options);
     if (response.status === 403 || response.status === 401) {
@@ -24,9 +23,12 @@ const fetchWithAuth = async (url: string, options: RequestInit) => {
 
   try {
     const response = await fetchWithRetry();
+    if (response.status >= 400 && response.status < 600) {
+      throw new Error("Bad response from server");
+    }
     return response;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return Promise.reject(error);
   }
 };
