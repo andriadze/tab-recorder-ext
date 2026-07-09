@@ -32,6 +32,7 @@ export interface Step {
   screenWidth?: number;
   screenHeight?: number;
   devicePixelRatio?: number;
+  recordingTimestampMs?: number;
   appendRecording?: boolean;
   insertBeforeStepId?: number;
 }

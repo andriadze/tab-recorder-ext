@@ -15,6 +15,7 @@ import {
 } from "react";
 import type { Guide } from "~ts/Guide";
 import type { StepEventType } from "~ts/Step";
+import type { VideoRecordingOptions } from "~ts/VideoRecording";
 import parseTitle from "~util/parseTitle";
 import { getWindowInformation } from "~util/windowInformation";
 import logoImage from "data-base64:~/assets/icon.png";
@@ -55,6 +56,19 @@ const shouldIgnoreTarget = (target: HTMLElement) =>
   target.tagName === "PLASMO-CSUI" ||
   target.id === "___guidemagic__inject__button__";
 
+function shouldShowRecordingVisuals(
+  guide?: Guide | null,
+  options?: Partial<VideoRecordingOptions> | null,
+) {
+  if (options?.showSteps === false) {
+    return false;
+  }
+  if (guide?.recordingMode === "video") {
+    return guide.videoRecording?.showSteps !== false;
+  }
+  return true;
+}
+
 export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (
   updatePosition
 ) => {
@@ -72,6 +86,7 @@ const PlasmoPricingExtra = () => {
   const [stepCount, setStepCount] = useState(0);
   const [recordingStarting, setRecordingStarting] = useState(false);
   const [isRecording, setRecording] = useState(false);
+  const [recordingVisualsEnabled, setRecordingVisualsEnabled] = useState(true);
   const [performAnim, setPerformAnim] = useState(false);
   const [fade, setFade] = useState(false);
   const [videoPreviewActive, setVideoPreviewActive] = useState(false);
@@ -86,6 +101,8 @@ const PlasmoPricingExtra = () => {
   const lastElem = useRef<Element>();
   const stoppingRef = useRef(false);
   const lastPointerCaptureRef = useRef<LastPointerCapture | null>(null);
+  const recordingStartedAtRef = useRef<number | null>(null);
+  const recordingModeRef = useRef<Guide["recordingMode"] | null>(null);
 
   const handleStopRecording = async () => {
     if (stoppingRef.current) {
@@ -96,6 +113,9 @@ const PlasmoPricingExtra = () => {
     setRect(null);
     setRecording(false);
     setPerformAnim(false);
+    setRecordingVisualsEnabled(true);
+    recordingStartedAtRef.current = null;
+    recordingModeRef.current = null;
     try {
       const result = await sendToBackground({
         name: "handle-stop-recording",
@@ -115,6 +135,7 @@ const PlasmoPricingExtra = () => {
     (event) => {
       if (
         isRecording &&
+        recordingVisualsEnabled &&
         event.target instanceof Element &&
         lastElem.current !== event.target
       ) {
@@ -122,25 +143,29 @@ const PlasmoPricingExtra = () => {
         lastElem.current = event.target;
       }
     },
-    [isRecording, lastElem]
+    [isRecording, lastElem, recordingVisualsEnabled]
   );
 
   const handleScroll = useCallback(
     (event) => {
       if (
         isRecording &&
+        recordingVisualsEnabled &&
         event.target instanceof Element &&
         lastElem.current !== event.target
       ) {
         lastElem.current = event.target;
       }
     },
-    [isRecording, lastElem]
+    [isRecording, lastElem, recordingVisualsEnabled]
   );
 
   const handleScrollFinished = useCallback(() => {
+    if (!recordingVisualsEnabled) {
+      return;
+    }
     setRect(lastElem.current?.getBoundingClientRect());
-  }, [setRect, lastElem]);
+  }, [setRect, lastElem, recordingVisualsEnabled]);
 
   const playVideoPreview = useCallback(() => {
     const video = videoPreviewRef.current;
@@ -278,13 +303,29 @@ const PlasmoPricingExtra = () => {
     (request, sender, sendResponse) => {
       if (request.message === "startRecording") {
         setRecordingStarting(false);
-        setPerformAnim(true);
+        const showVisuals = shouldShowRecordingVisuals(null, request.options);
+        recordingStartedAtRef.current =
+          typeof request.recordingStartedAt === "number"
+            ? request.recordingStartedAt
+            : Date.now();
+        void storage.get<Guide>("guide").then((guide) => {
+          recordingModeRef.current = guide?.recordingMode || null;
+        });
+        setRecordingVisualsEnabled(showVisuals);
+        setPerformAnim(showVisuals);
+        if (!showVisuals) {
+          setFade(false);
+          setRect(null);
+        }
         setRecording(true);
       } else if (request.message === "stopRecording") {
         setRecordingStarting(false);
         setRect(null);
         setRecording(false);
         setPerformAnim(false);
+        setRecordingVisualsEnabled(true);
+        recordingStartedAtRef.current = null;
+        recordingModeRef.current = null;
       } else if (request.message === "recordingStarting") {
         setRecordingStarting(true);
       } else if (request.message === "startVideoPreview") {
@@ -323,6 +364,7 @@ const PlasmoPricingExtra = () => {
       isRecording,
       setRecording,
       setRect,
+      setFade,
       stopVideoPreviewDiagnostics,
     ]
   );
@@ -334,7 +376,7 @@ const PlasmoPricingExtra = () => {
   }, [performAnim]);
 
   const onMouseUp = (event: PointerEvent) => {
-    if (!isRecording) {
+    if (!isRecording || !recordingVisualsEnabled) {
       return;
     }
     const target = event.target as HTMLElement;
@@ -373,6 +415,10 @@ const PlasmoPricingExtra = () => {
         screenHeight,
         devicePixelRatio,
       } = getWindowInformation();
+      const recordingTimestampMs = recordingStartedAtRef.current &&
+        recordingModeRef.current === "video"
+        ? Math.max(0, Date.now() - recordingStartedAtRef.current)
+        : undefined;
 
       try {
         const result = await sendToBackground({
@@ -399,6 +445,7 @@ const PlasmoPricingExtra = () => {
             screenWidth,
             screenHeight,
             devicePixelRatio,
+            recordingTimestampMs,
           },
         });
 
@@ -487,10 +534,24 @@ const PlasmoPricingExtra = () => {
       const res = await storage.get<Guide>("guide");
       if (res && res.active) {
         setStepCount(res.stepCount || 0);
+        const showVisuals = shouldShowRecordingVisuals(res);
+        recordingModeRef.current = res.recordingMode || null;
+        if (!recordingStartedAtRef.current) {
+          recordingStartedAtRef.current = Date.now();
+        }
+        setRecordingVisualsEnabled(showVisuals);
+        if (!showVisuals) {
+          setFade(false);
+          setRect(null);
+          setPerformAnim(false);
+        }
         setRecording(true);
       } else {
         setStepCount(0);
         setRecording(false);
+        setRecordingVisualsEnabled(true);
+        recordingStartedAtRef.current = null;
+        recordingModeRef.current = null;
         setRect(null);
       }
     } catch (exc) {
@@ -584,12 +645,12 @@ const PlasmoPricingExtra = () => {
           <div className="rec-starting">Recording starting...</div>
         </div>
       )}
-      {performAnim && (
+      {recordingVisualsEnabled && performAnim && (
         <div className="main-container-ripple">
           <span className="ripple"></span>
         </div>
       )}
-      {fade && (
+      {recordingVisualsEnabled && fade && (
         <div
           onAnimationEnd={() => {
             setFade(false);
@@ -597,7 +658,7 @@ const PlasmoPricingExtra = () => {
           className={"fade-in-container"}
         />
       )}
-      {rect && (
+      {recordingVisualsEnabled && rect && (
         <div
           id="rec_border"
           style={{
@@ -617,6 +678,7 @@ const PlasmoPricingExtra = () => {
           animate={fade}
           onStopClicked={handleStopRecording}
           stepCount={stepCount}
+          showStepCount={recordingVisualsEnabled}
         />
       )}
       {videoPreviewActive && (
@@ -650,6 +712,7 @@ const PlasmoPricingExtra = () => {
 const RecButton = (props: {
   stepCount: number;
   animate: boolean;
+  showStepCount: boolean;
   onStopClicked: () => void;
 }) => {
   const [hovering, setHovering] = useState(false);
@@ -681,9 +744,11 @@ const RecButton = (props: {
     >
       {hovering ? (
         <>
-          <div className="red-circle-count">
-            <p>Steps: {props.stepCount || 0}</p>
-          </div>
+          {props.showStepCount && (
+            <div className="red-circle-count">
+              <p>Steps: {props.stepCount || 0}</p>
+            </div>
+          )}
           <div className="red-circle" />
         </>
       ) : (

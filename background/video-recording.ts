@@ -17,7 +17,7 @@ async function failVideoUpload(guideId: number, message: string) {
     guideId,
     active: false,
     status: "failed",
-    options: { microphone: false, webcam: false },
+    options: { microphone: false, webcam: false, showSteps: true },
     error: message,
   });
 }
@@ -39,6 +39,7 @@ async function openRecorderTab(
     guideId: String(guideId),
     microphone: String(options.microphone),
     webcam: String(options.webcam),
+    showSteps: String(options.showSteps),
   });
   if (targetTabId) {
     params.set("targetTabId", String(targetTabId));
@@ -146,7 +147,11 @@ export function registerVideoRecordingBackground() {
         void (async () => {
           const targetTabId = Number(message.targetTabId);
           await chrome.tabs
-            .sendMessage(targetTabId, { message: "startRecording" })
+            .sendMessage(targetTabId, {
+              message: "startRecording",
+              options: message.options,
+              recordingStartedAt: message.recordingStartedAt,
+            })
             .catch(() => undefined);
           await chrome.tabs.update(targetTabId, { active: true }).catch(() => undefined);
           const current = await storage.get<any>("videoRecording");

@@ -54,6 +54,18 @@ function getDefaultVideoRecordingOptions(): VideoRecordingOptions {
   return {
     microphone: false,
     webcam: false,
+    showSteps: true,
+  };
+}
+
+function normalizeVideoRecordingOptions(
+  options?: Partial<VideoRecordingOptions> | null,
+): VideoRecordingOptions {
+  return {
+    ...getDefaultVideoRecordingOptions(),
+    ...options,
+    showSteps:
+      typeof options?.showSteps === "boolean" ? options.showSteps : true,
   };
 }
 
@@ -308,7 +320,7 @@ async function setRecordingState(
     guideId,
     active: current?.active ?? true,
     status: current?.status || "starting",
-    options: current?.options || activeOptions || getDefaultVideoRecordingOptions(),
+    options: normalizeVideoRecordingOptions(current?.options || activeOptions),
     ...patch,
   });
   if (patch.status) {
@@ -409,10 +421,12 @@ async function uploadRecordedVideo(
   guideId: number,
   screenBlob: Blob,
   webcamBlob?: Blob | null,
+  showSteps = true,
 ) {
   const createFormData = () => {
     const formData = new FormData();
     formData.append("screen", screenBlob, `guide-${guideId}-screen.webm`);
+    formData.append("stepsVisible", String(showSteps));
     if (webcamBlob?.size) {
       formData.append("webcam", webcamBlob, `guide-${guideId}-webcam.webm`);
     }
@@ -1071,7 +1085,12 @@ async function uploadBlob(
     status: "uploading",
     error: undefined,
   });
-  await uploadRecordedVideo(guideId, screenBlob, webcamBlob);
+  await uploadRecordedVideo(
+    guideId,
+    screenBlob,
+    webcamBlob,
+    activeOptions?.showSteps ?? true,
+  );
   console.info("[GuideMagic video] recorded video uploaded", {
     guideId,
     screenSize: screenBlob.size,
@@ -1162,7 +1181,8 @@ async function startRecording(
   preparedUserStream?: MediaStream | null,
 ) {
   activeGuideId = guideId;
-  activeOptions = options;
+  const recordingOptions = normalizeVideoRecordingOptions(options);
+  activeOptions = recordingOptions;
   chunks = [];
   webcamChunks = [];
   recorderStopped = false;
@@ -1174,18 +1194,19 @@ async function startRecording(
     guideId,
     active: true,
     status: "starting",
-    options,
+    options: recordingOptions,
     error: undefined,
   });
 
   try {
-    const userStream = preparedUserStream ?? (await getUserStream(options));
+    const userStream =
+      preparedUserStream ?? (await getUserStream(recordingOptions));
     activeUserStream = userStream;
     activeStreams = [];
 
     console.info("[GuideMagic video] requesting display media", {
       guideId,
-      options,
+      options: recordingOptions,
     });
     const tabStream = await getDisplayStream();
     console.info("[GuideMagic video] display media granted", {
@@ -1279,7 +1300,7 @@ async function startRecording(
       guideId,
       active: true,
       status: "recording",
-      options,
+      options: recordingOptions,
       error: undefined,
     });
   } catch (error) {
@@ -1294,7 +1315,7 @@ async function startRecording(
         guideId,
         active: true,
         status: "starting",
-        options,
+        options: recordingOptions,
         error: undefined,
       });
       throw error;
@@ -1575,8 +1596,15 @@ function VideoRecorderPage() {
         ...options,
         ...patch,
       };
+      const shouldRefreshSetupMedia =
+        nextOptions.microphone !== options.microphone ||
+        nextOptions.webcam !== options.webcam ||
+        nextOptions.audioDeviceId !== options.audioDeviceId ||
+        nextOptions.videoDeviceId !== options.videoDeviceId;
       await persistOptions(nextOptions);
-      await prepareSetupMedia(nextOptions);
+      if (shouldRefreshSetupMedia) {
+        await prepareSetupMedia(nextOptions);
+      }
     },
     [options, persistOptions, prepareSetupMedia],
   );
@@ -1618,6 +1646,7 @@ function VideoRecorderPage() {
           guideId: nextSession.guideId,
           targetTabId: nextSession.targetTabId,
           options: selectedOptions,
+          recordingStartedAt,
         });
       } catch (err) {
         recordingStartedRef.current = false;
@@ -1654,10 +1683,13 @@ function VideoRecorderPage() {
     void (async () => {
       const savedOptions =
         (await storage.get<VideoRecordingOptions>(VIDEO_RECORDING_PREFERENCES_KEY)) ||
-        getDefaultVideoRecordingOptions();
+        null;
       const nextOptions = {
-        ...getDefaultVideoRecordingOptions(),
-        ...savedOptions,
+        ...normalizeVideoRecordingOptions(savedOptions),
+        showSteps:
+          params.get("showSteps") === "false"
+            ? false
+            : savedOptions?.showSteps ?? true,
       };
       setOptions(nextOptions);
       activeOptions = nextOptions;
@@ -1875,6 +1907,35 @@ function VideoRecorderPage() {
                   ))}
                 </select>
               </div>
+              <div style={{ ...styles.controlRow, ...styles.controlRowNoAccessory }}>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={options.showSteps}
+                  aria-label="Record steps"
+                  style={{
+                    ...styles.switchButton,
+                    ...(options.showSteps ? styles.switchButtonOn : {}),
+                  }}
+                  disabled={controlsDisabled}
+                  onClick={() => {
+                    void updateRecordingOptions({
+                      showSteps: !options.showSteps,
+                    });
+                  }}
+                >
+                  <span
+                    style={{
+                      ...styles.switchKnob,
+                      ...(options.showSteps ? styles.switchKnobOn : {}),
+                    }}
+                  />
+                </button>
+                <div style={styles.controlText}>
+                  <strong style={styles.controlTitle}>Record clicks</strong>
+                  <small style={styles.controlHint}>Show captured clicks in the guide(Only works for clicks inside the browser)</small>
+                </div>
+              </div>
             </div>
             <p style={styles.shareHint}>
               After you share your screen, you will return to the original page and recording will start.
@@ -2020,6 +2081,9 @@ const styles = {
     border: "1px solid #e2e8f0",
     borderRadius: 10,
     background: "#fbfdff",
+  },
+  controlRowNoAccessory: {
+    gridTemplateColumns: "48px minmax(120px, 1fr)",
   },
   switchButton: {
     position: "relative",

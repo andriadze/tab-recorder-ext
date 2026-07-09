@@ -171,7 +171,11 @@ export function useGuide() {
   };
 
   const startVideoRecording = async (
-    options: VideoRecordingOptions = { microphone: false, webcam: false },
+    options: VideoRecordingOptions = {
+      microphone: false,
+      webcam: false,
+      showSteps: true,
+    },
   ) => {
     if (actionPending) {
       return false;

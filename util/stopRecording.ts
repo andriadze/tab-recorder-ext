@@ -62,7 +62,11 @@ async function stopVideoGuideRecording(guide: Guide) {
     targetTabId: guide.recordingTabId,
     active: false,
     status: "uploading",
-    options: guide.videoRecording || { microphone: false, webcam: false },
+    options: guide.videoRecording || {
+      microphone: false,
+      webcam: false,
+      showSteps: true,
+    },
     uploadStartedAt: Date.now(),
   };
   await storage.remove("guide");
